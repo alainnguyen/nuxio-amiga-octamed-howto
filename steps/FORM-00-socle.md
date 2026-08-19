@@ -8,6 +8,26 @@ Aucune note n'est écrite dans cette étape. C'est de la mesure.
 
 ---
 
+## 0.0 — Ordre imposé
+
+**Le chrono de boot passe en premier.** Il exige un départ à froid : si tu
+allumes la machine pour lancer `Avail`, le départ à froid est consommé et le
+chrono attend le lendemain, ou au moins une extinction longue.
+
+| Rang | Action | Contrainte |
+|---|---|---|
+| 1 | Chrono de boot (0.3) | **Machine froide, chrono en main avant l'interrupteur** |
+| 2 | `Avail` (0.2) | Immédiatement après le boot, système au repos |
+| 3 | Version OctaMED (0.1) | — |
+| 4 | Chronos de chargement (0.4) | Deux mods de tailles nettement différentes |
+| 5 | Archive de référence (0.5) | Gain TASCAM réglé et noté **avant** la prise 1 |
+
+À préparer avant d'allumer : chrono, de quoi noter, et **deux mods de tailles
+connues sur la CF**. Si la carte n'en contient qu'un, transférer le second
+depuis le portable maintenant — machine éteinte de toute façon.
+
+---
+
 ## 0.1 — Version exacte d'OctaMED
 
 Relever la **chaîne complète** affichée dans About/Info, pas « v4 ».
