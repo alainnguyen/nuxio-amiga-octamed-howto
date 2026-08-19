@@ -14,6 +14,10 @@
 #
 set -euo pipefail
 
+# bc produit toujours "7.10" avec un point. En locale FR, printf attend
+# une virgule et rejette le nombre. On force la locale C pour l'affichage.
+export LC_ALL=C
+
 # ---------------------------------------------------------------
 # Constantes
 # ---------------------------------------------------------------
@@ -29,6 +33,12 @@ CLOCK_PAL=3546895        # horloge Paula PAL, en Hz
 RATE_A=11084             # periode 320
 RATE_B=16574             # periode 214
 RATE_C=22168             # periode 160
+
+# Attenuation appliquee AVANT le reechantillonnage.
+# Le filtre de rate reconstruit la courbe entre les echantillons et peut
+# depasser le plein niveau (overshoot). Sur un break deja au max, ca
+# ecrete. -2 dB suffit ; passer a -3 si des WARN "clipped" subsistent.
+HEADROOM=-2              # dB
 
 # ---------------------------------------------------------------
 # Arguments
@@ -101,15 +111,23 @@ for PAIR in "A $RATE_A" "B $RATE_B" "C $RATE_C"; do
     OUT="AMEN${BPM}${TAG}.IFF"
 
     # -D            : pas de dither (grain 8 bits assume, previsible)
+    # gain          : headroom, applique AVANT rate
     # speed / rate  : accelere puis reechantillonne au taux Paula
     # pad 0 0.05    : filet de securite si le rendu tombe court
     # trim 0 Ls     : coupe a la longueur exacte -- indispensable,
     #                 le reechantillonnage arrondit toujours
+    ERRLOG=$(mktemp)
     sox -D "$SRC" -b 8 -e signed-integer -c 1 -r "$R" -t 8svx "$OUT" \
+        gain "$HEADROOM" \
         speed "$K" \
         rate -v "$R" \
         pad 0 0.05 \
-        trim 0 "${L}s"
+        trim 0 "${L}s" 2>"$ERRLOG" \
+        || { cat "$ERRLOG" >&2; rm -f "$ERRLOG"; exit 1; }
+
+    # "pads not applied" = le filet n'a pas servi, cas nominal : on masque.
+    grep -v 'pads not applied' "$ERRLOG" >&2 || true
+    rm -f "$ERRLOG"
 
     LOUT=$(soxi -s "$OUT")
     KO=$(echo "scale=1; $LOUT / 1024" | bc -l)
