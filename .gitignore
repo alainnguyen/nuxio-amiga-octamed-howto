@@ -1,0 +1,19 @@
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Prises TASCAM et samples : hors dépôt.
+# Git n'est pas fait pour ça — seules les MESURES sont versionnées
+# (ressources/releves/*.md). L'audio vit à côté, sauvegardé autrement.
+ressources/audio/
+*.wav
+*.aif
+*.aiff
+*.flac
+
+# Samples sources bruts
+ressources/samples/
+
+# Les .med sont versionnés (petits, et l'historique a de la valeur) :
+# pas d'exclusion ici. Voir README.
